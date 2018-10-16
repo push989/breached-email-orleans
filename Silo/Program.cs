@@ -2,15 +2,16 @@
 using System.Net;
 using System.Threading.Tasks;
 using Grains;
+using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 
 namespace Silo
 {
-    class Program
+    internal class Program
     {
-        static int Main(string[] args)
+        private static int Main(string[] args)
         {
             return RunMainAsync().Result;
         }
@@ -42,14 +43,16 @@ namespace Silo
                 .Configure<ClusterOptions>(options =>
                 {
                     options.ClusterId = "dev";
-                    options.ServiceId = "HelloWorldApp";
+                    options.ServiceId = "BreachedEmailApp";
                 })
                 .Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Loopback)
                 .ConfigureApplicationParts(parts =>
                 {
                     parts.AddApplicationPart(typeof(EmailDomainGrain).Assembly).WithReferences();
                 })
-                .AddAzureBlobGrainStorage("blobStore", options => options.ConnectionString = "UseDevelopmentStorage=true");
+                // use the ConnectionString shortcut to connect to the local emulator.
+                .AddAzureBlobGrainStorage("blobStore", options => options.ConnectionString = "UseDevelopmentStorage=true")
+                .ConfigureLogging(logging => logging.AddConsole());
 
             var host = builder.Build();
             await host.StartAsync();

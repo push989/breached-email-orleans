@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using GrainInterfaces;
 using Orleans;
@@ -23,7 +22,7 @@ namespace Grains
                 State.BreachedEmails = new List<string>();
             }
 
-            RegisterTimer(async (state) => await base.WriteStateAsync(), null, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5));
+            RegisterTimer(async (_) => await base.WriteStateAsync(), null, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5));
 
             return base.OnActivateAsync();
         }
@@ -31,11 +30,6 @@ namespace Grains
         public Task<bool> CheckEmailBreached(string email)
         {
             return Task.FromResult(State.BreachedEmails.Contains(email));
-        }
-
-        public Task<List<string>> GetBreachedEmails()
-        {
-            return Task.FromResult(State.BreachedEmails);
         }
 
         public Task AddBreachedEmail(string email)
